@@ -9,14 +9,16 @@ before_install:
   - docker build -t narvmtz/hw3-ci-me-dice:0.0.1 .
 install:
   - pip install -r requirements.txt
-script: python -m pytest -v
-deploy:
-  provider: script
-  script: bash docker_push
-  on:
-    branch: main
 jobs:
   include:
+    - stage: tests
+      script: python -m pytest -v
+    - stage: deploy to Dockerhub
+      deploy:
+        provider: script
+        script: bash docker_push
+        on:
+          branch: main
     - stage: deploy staging heroku
       script: skip
       deploy: &deploy
