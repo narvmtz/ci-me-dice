@@ -14,9 +14,11 @@ jobs:
     - stage: tests
       script: python -m pytest -v
     - stage: deploy to Dockerhub
-      script:
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        docker push narvmtz/hw3-ci-me-dice:0.0.1
+      deploy:
+        provider: script
+        script: bash docker_push
+        on:
+          branch: main
     - stage: deploy staging heroku
       script: skip
       deploy: &deploy
