@@ -5,22 +5,18 @@ python:
   - '3.8'
 services:
   - docker
+install:
+  - pip install -r requirements.txt
 jobs:
   include:
-    - stage: docker image
-      before_install:
-        - docker build -t narvmtz/hw3-ci-me-dice:0.0.1 .
-      install:
-        - pip install -r requirements.txt
-      script: skip
     - stage: tests
       script: python -m pytest -v
     - stage: deploy to Dockerhub
-      deploy:
-        provider: script
-        script: bash docker_push
-        on:
-          branch: main
+      script:
+        - docker login -u="$USERNAME" -p="$DOCKER_PASSWORD"
+        - docker build -t $USERNAME/$DOCKER_REPO .
+        - docker images
+        - docker push $USERNAME/$DOCKER_REPO
     - stage: deploy staging heroku
       script: skip
       deploy: &deploy
@@ -29,7 +25,7 @@ jobs:
         api_key: '$HEROKU_AUTH_TOKEN'
         app: hw3-ci-me-dice
         on:
-          repo: narvmtz/ci-me-dice
+          repo: $USER/$REPO
           branch: main
     - stage: deploy to production heroku
       script: skip
