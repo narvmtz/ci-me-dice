@@ -13,7 +13,11 @@ jobs:
   include:
     - stage: tests
       script: python -m pytest -v
-    - stage: deploy staging
+    - stage: deploy to Dockerhub
+      script:
+        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        docker push narvmtz/hw3-ci-me-dice:0.0.1
+    - stage: deploy staging heroku
       script: skip
       deploy: &deploy
         provider: heroku
@@ -23,7 +27,7 @@ jobs:
         on:
           repo: narvmtz/ci-me-dice
           branch: main
-    - stage: deploy to production
+    - stage: deploy to production heroku
       script: skip
       deploy:
         <<: *deploy
